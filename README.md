@@ -1,2 +1,2 @@
 # jsonite
-pure python dict-like interface over SQLite
+Built this for a consulting project, more to come
