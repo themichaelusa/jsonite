@@ -6,6 +6,7 @@ import sqlite3
 import constants as cst
 
 ### PACKAGE IMPORTS
+from utils import multi_coln_read_str
 
 ### CONSTANTS/GLOBALS
 
@@ -14,8 +15,20 @@ class JsoniteDB:
 		self.conn = sqlite3.connect(db_path)
 		self.cursor = self.conn.cursor()
 		self.selected_table = None
+		self.columns = {}
 
+	### INIT METHODS
+	def __get_all_colns():
+		pass
+
+	### MAGIC METHODS
 	def __len__(self):
+		pass
+
+	def __getitem__(self, key):
+		pass
+
+	def __setitem__(self, key, value):
 		pass
 
 	### BASIC DB UTILITIES
@@ -75,7 +88,7 @@ class JsoniteDB:
 
 				all_ids = self.get_all_table_ids()
 				return [(tid, data[0]) for tid, data in zip(
-					all_ids, result)]
+					all_ids, result)] 
 			else:
 				# read all rows
 				result = self.cursor.execute(
@@ -86,7 +99,7 @@ class JsoniteDB:
 				return [(id, json.loads(r)) for id, r in result]
 
 	# if column=None, read row. if id is None, read_all
-	def write(self, id, column=None, data=None):
+	def write(self, id, column=None, data=None, is_bulk=False):
 		if data is None:
 			return
 
@@ -115,7 +128,8 @@ class JsoniteDB:
 		cst.WRITE_JSON_STR.format(
 		self.selected_table), [id, result])
 
-		self.conn.commit()
+		if not is_bulk:
+			self.conn.commit()
 
 	def add(self, id, data):
 		if not self.row_exists(id):
@@ -123,16 +137,22 @@ class JsoniteDB:
 		else:
 			print('ID {} exists'.format(id))
 
-	def delete(self, id=None):
+	def delete(self, id=None, use_commit=False):
 		if id and self.row_exists(id):
 			self.cursor.execute(
 			cst.DELETE_ROW_STR.format(
 			self.selected_table, id))
-		self.conn.commit()
+
+		if use_commit:
+			self.conn.commit()
 
 	def save(self):
 		self.conn.commit()
 
 if __name__ == '__main__':
+	jdb = JsoniteDB('test.db')
+	jdb.selected_table = 'twitter_data'
+	print(jdb.read(column='random_coln'))
+	print(multi_coln_read_str(['name', 'keywords_searched', 'profile_url', 'description']))
 	pass
 			
